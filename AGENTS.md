@@ -29,16 +29,22 @@ cli-app/
 │   └── src/
 ├── frontend/               # React + Vite frontend
 │   └── src/
+├── cli/                    # Command-line interface
+│   ├── src/
+│   │   ├── commands/       # CLI commands
+│   │   └── services/       # API clients
+│   └── README.md           # CLI documentation
 └── package.json            # Workspace root
 ```
 
 ## MCP Agent System
 
 ### Supported Agents
-1. **OpenCode** - PR reviews, issue analysis
-2. **Codex** - Code generation, refactoring
-3. **Amp** - Complex multi-step tasks
-4. **Gemini-CLI** - Analysis, documentation
+1. **Continue** - Interactive code assistance, chat, review, generation
+2. **OpenCode** - PR reviews, issue analysis
+3. **Codex** - Code generation, refactoring
+4. **Amp** - Complex multi-step tasks
+5. **Gemini-CLI** - Analysis, documentation
 
 ### Orchestration Modes
 - **Parallel**: Multiple agents on independent tasks
@@ -51,6 +57,7 @@ cli-app/
 Copy `.env.example` to `.env` in each directory:
 - `/backend/.env`
 - `/.mcp/.env`
+- `/cli/.env`
 
 Add your API keys for each agent.
 
@@ -65,6 +72,9 @@ cd frontend && npm test
 
 # MCP Orchestrator
 cd .mcp && npm test
+
+# CLI
+cd cli && npm test
 ```
 
 ## Build Commands
@@ -77,4 +87,9 @@ npm run build
 npm run build --workspace=backend
 npm run build --workspace=frontend
 npm run build --workspace=.mcp
+npm run build --workspace=cli
+
+# Build and link CLI globally
+npm run build:cli
+cd cli && npm link
 ```

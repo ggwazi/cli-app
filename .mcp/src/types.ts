@@ -1,4 +1,4 @@
-export type AgentType = 'opencode' | 'codex' | 'amp' | 'gemini';
+export type AgentType = 'opencode' | 'codex' | 'amp' | 'gemini' | 'continue';
 
 export type TaskType = 
   | 'code-review'

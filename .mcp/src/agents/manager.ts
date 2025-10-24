@@ -1,13 +1,22 @@
 import { createLogger } from '../logger.js';
 import type { Task, AgentType, AgentResult } from '../types.js';
+import { ContinueAgent } from './continue.js';
 
 const logger = createLogger('agent-manager');
 
 export class AgentManager {
   private agents: Map<AgentType, any> = new Map();
+  private continueAgent?: ContinueAgent;
 
   async initialize() {
     logger.info('Initializing agents...');
+    
+    // Initialize Continue agent
+    if (process.env.CONTINUE_ENABLED === 'true') {
+      this.continueAgent = new ContinueAgent();
+      this.agents.set('continue', this.continueAgent);
+      logger.info('Continue agent enabled');
+    }
     
     if (process.env.OPENCODE_ENABLED === 'true') {
       logger.info('OpenCode agent enabled');
@@ -52,6 +61,12 @@ export class AgentManager {
   }
 
   private async invokeAgent(task: Task): Promise<any> {
+    // Use Continue agent if available
+    if (task.agent === 'continue' && this.continueAgent) {
+      const result = await this.continueAgent.execute(task);
+      return result.output;
+    }
+    
     return { message: `Task ${task.id} processed by ${task.agent}` };
   }
 }

@@ -5,15 +5,19 @@
   "workspaces": [
     "frontend",
     "backend",
-    ".mcp"
+    ".mcp",
+    "cli"
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\" \"npm run dev:mcp\"",
     "dev:backend": "npm run dev --workspace=backend",
     "dev:frontend": "npm run dev --workspace=frontend",
     "dev:mcp": "npm run dev --workspace=.mcp",
+    "dev:cli": "npm run dev --workspace=cli",
     "build": "npm run build --workspaces",
-    "install:all": "npm install && npm install --workspaces"
+    "build:cli": "npm run build --workspace=cli",
+    "install:all": "npm install && npm install --workspaces",
+    "cli": "npm run --workspace=cli start"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
