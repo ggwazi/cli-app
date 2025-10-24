@@ -1,0 +1,24 @@
+{
+  "description": "Template configuration for this project. See https://www.codebuff.com/config for all options.",
+  "startupProcesses": [
+    {
+      "name": "frontend",
+      "command": "npm run dev",
+      "cwd": "frontend",
+      "stdoutFile": "logs/frontend.log"
+    },
+    {
+      "name": "backend",
+      "command": "npm run dev",
+      "cwd": "backend",
+      "stdoutFile": "logs/backend.log"
+    },
+    {
+      "name": "mcp",
+      "command": "npm run dev",
+      "cwd": ".mcp",
+      "stdoutFile": "logs/mcp.log"
+    }
+  ],
+  "fileChangeHooks": []
+}

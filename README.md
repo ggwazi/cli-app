@@ -1,17 +1,60 @@
 # CLI App - Multi-Agent AI Orchestration Platform
 
+A sophisticated platform for orchestrating multiple AI CLI tools (OpenCode, Codex, Amp, Gemini-CLI) as background agents using the Model Context Protocol (MCP).
+
+## Features
+
+- 🤖 **Multi-Agent Orchestration** - Coordinate multiple AI agents for complex tasks
+- 🔄 **Background Processing** - Agents run as background workers with task queuing
+- 🎯 **Smart Routing** - Automatically route tasks to the best-suited agent
+- 📊 **Real-time Monitoring** - Track agent performance and task status
+- 🔌 **Extensible Architecture** - Easy to add new agents and capabilities
+- 💬 **Continue Integration** - Direct CLI access to Continue AI
+- 🎨 **Modern UI** - React-based frontend with Vite
+
 ## Quick Start
 
-### Development
 ```bash
+# Install all dependencies
 npm run install:all
+
+# Start all services (frontend, backend, MCP orchestrator)
 npm run dev
+
+# Or start services individually
+npm run dev:frontend  # Start React frontend
+npm run dev:backend   # Start Express backend with MCP API
+npm run dev:mcp       # Start MCP orchestrator
 ```
 
+### Prerequisites
+- Node.js 18+
+- Redis server running (for MCP task queue)
+- API keys configured in `.env` files
+
 ### Access Points
-- Frontend: http://localhost:5173
-- Backend API: http://localhost:3000
-- MCP Orchestrator: http://localhost:8080
+- **Frontend**: http://localhost:5173
+- **Backend API**: http://localhost:3000
+  - **MCP API**: http://localhost:3000/api/mcp
+- **MCP Orchestrator**: http://localhost:8080
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────┐
+│           MCP Orchestrator (Node.js)                │
+│  - Task Queue Management                            │
+│  - Agent Lifecycle Control                          │
+│  - Context Sharing & State Management               │
+└──────────────┬──────────────────────────────────────┘
+               │
+    ┌──────────┴────────────┬──────────┬──────────┐
+    │                       │          │          │
+┌───▼────┐  ┌──────▼──────┐ ┌───▼───┐ ┌────▼────┐
+│OpenCode│  │   Codex     │ │  Amp  │ │ Gemini  │
+│ Agent  │  │   Agent     │ │ Agent │ │  Agent  │
+└────────┘  └─────────────┘ └───────┘ └─────────┘
+```
 
 ## Project Structure
 
@@ -24,8 +67,8 @@ cli-app/
 │   │   ├── orchestrator.ts # Main orchestrator
 │   │   ├── agents/         # Agent implementations
 │   │   └── types.ts        # TypeScript definitions
-│   └── README.md           # MCP documentation
-├── backend/                # Express.js backend
+│   └── README.md           # Detailed MCP documentation
+├── backend/                # Express.js backend API
 │   └── src/
 ├── frontend/               # React + Vite frontend
 │   └── src/
@@ -46,20 +89,48 @@ cli-app/
 4. **Amp** - Complex multi-step tasks
 5. **Gemini-CLI** - Analysis, documentation
 
+### Agent Capabilities
+
+#### OpenCode
+- PR reviews and code quality analysis
+- Issue context gathering
+- Diff analysis
+
+#### Codex
+- Code generation
+- Refactoring
+- Optimization
+
+#### Amp
+- Complex multi-step tasks
+- Multi-file editing
+- Task planning
+
+#### Gemini-CLI
+- Code analysis and explanations
+- Documentation generation
+- Summarization
+
 ### Orchestration Modes
-- **Parallel**: Multiple agents on independent tasks
-- **Sequential**: Pipeline processing
-- **Consensus**: Multi-agent voting
-- **Specialized**: Route to best agent
+1. **Parallel** - Multiple agents work independently
+2. **Sequential** - Pipeline processing (one agent's output → next agent's input)
+3. **Consensus** - Multiple agents vote on best solution
+4. **Specialized** - Route to most capable agent
 
 ## Configuration
 
 Copy `.env.example` to `.env` in each directory:
-- `/backend/.env`
-- `/.mcp/.env`
-- `/cli/.env`
+- `backend/.env`
+- `.mcp/.env`
+- `cli/.env`
 
-Add your API keys for each agent.
+Add your API keys:
+```env
+OPENCODE_API_KEY=your_key
+CODEX_API_KEY=your_key
+AMP_API_KEY=your_key
+GEMINI_API_KEY=your_key
+```
 
 ## CLI Usage
 
@@ -90,6 +161,51 @@ cli-app task list
 
 See [cli/README.md](./cli/README.md) for full CLI documentation.
 
+## API Documentation
+
+The backend exposes MCP capabilities through REST endpoints:
+
+### Submit a Task
+```bash
+curl -X POST http://localhost:3000/api/mcp/tasks \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "code-review",
+    "payload": { "pr": "123" }
+  }'
+```
+
+### Check Task Status
+```bash
+curl http://localhost:3000/api/mcp/tasks/{taskId}/status
+```
+
+### Get Task Result
+```bash
+curl http://localhost:3000/api/mcp/tasks/{taskId}/result
+```
+
+See [Backend API Documentation](backend/API.md) for complete endpoint details.
+
+## Development
+
+```bash
+# Run specific workspace
+npm run dev:backend
+npm run dev:frontend
+npm run dev:mcp
+
+# Build all
+npm run build
+
+# Build and link CLI globally
+npm run build:cli
+cd cli && npm link
+
+# Test
+npm test --workspaces
+```
+
 ## Testing Commands
 
 ```bash
@@ -106,64 +222,12 @@ cd .mcp && npm test
 cd cli && npm test
 ```
 
-## Build Commands
+## Documentation
 
-```bash
-# All workspaces
-npm run build
-
-# Individual
-npm run build --workspace=backend
-npm run build --workspace=frontend
-npm run build --workspace=.mcp
-npm run build --workspace=cli
-
-# Build and link CLI globally
-npm run build:cli
-cd cli && npm link
-```
-
-## Architecture
-
-```mermaid
-graph TB
-    CLI[CLI Tool]
-    Frontend[Frontend UI]
-    Backend[Backend API]
-    Orchestrator[MCP Orchestrator]
-    Redis[(Redis Queue)]
-    
-    Continue[Continue Agent]
-    OpenCode[OpenCode Agent]
-    Codex[Codex Agent]
-    Amp[Amp Agent]
-    Gemini[Gemini Agent]
-    
-    CLI --> Orchestrator
-    CLI --> Continue
-    Frontend --> Backend
-    Backend --> Orchestrator
-    Orchestrator --> Redis
-    
-    Redis --> Continue
-    Redis --> OpenCode
-    Redis --> Codex
-    Redis --> Amp
-    Redis --> Gemini
-    
-    style Continue fill:#4CAF50
-    style CLI fill:#2196F3
-```
-
-## Features
-
-- 🤖 **Multi-Agent Orchestration**: Coordinate multiple AI agents
-- 💬 **Continue Integration**: Direct CLI access to Continue AI
-- 🎯 **Smart Routing**: Automatically select best agent for tasks
-- 📊 **Task Queue**: Redis-backed task management
-- 🔄 **Real-time Updates**: WebSocket support for live status
-- 🎨 **Modern UI**: React-based frontend with Vite
-- ⚡ **High Performance**: TypeScript + async processing
+- [Backend API Reference](backend/API.md)
+- [MCP Orchestration Details](.mcp/README.md)
+- [Agent Configuration](AGENTS.md)
+- [CLI Documentation](cli/README.md)
 
 ## License
 
