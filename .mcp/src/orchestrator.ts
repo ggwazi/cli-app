@@ -62,6 +62,16 @@ class MCPOrchestrator extends EventEmitter {
   }
 
   private selectBestAgent(task: Task): AgentType {
+    // Prefer Continue for interactive tasks if enabled
+    if (process.env.CONTINUE_ENABLED === 'true') {
+      if (task.type === 'code-review') return 'continue';
+      if (task.type === 'generate-code') return 'continue';
+      if (task.type === 'refactor') return 'continue';
+      if (task.type === 'analyze') return 'continue';
+      if (task.type === 'document') return 'continue';
+    }
+    
+    // Fallback to specialized agents
     if (task.type === 'code-review') return 'opencode';
     if (task.type === 'generate-code') return 'codex';
     if (task.type === 'complex-task') return 'amp';
